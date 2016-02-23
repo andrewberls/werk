@@ -5,16 +5,17 @@ import java.util.Optional
 import java.util.HashMap
 import kotlin.collections.Set
 import redis.clients.jedis.JedisPool
+import com.andrewberls.werk.ConcurrentCache
 import com.andrewberls.werk.Config
 import com.andrewberls.werk.IJobHandler
 import com.andrewberls.werk.Job
 import com.andrewberls.werk.RedisUtils
 
-class Executor(val config: Config, val pool: JedisPool) {
+class Executor(
+        val config: Config,
+        val pool: JedisPool,
+        val ctorCache: ConcurrentCache<String, Constructor<*>>) {
     private val KEY = "werk::jobs"
-
-    // className -> Constructor
-    private val ctorCache = HashMap<String, Constructor<*>>()
 
     @Suppress("UNCHECKED_CAST")
     private fun acquireJob(): Optional<Job> {
@@ -29,20 +30,10 @@ class Executor(val config: Config, val pool: JedisPool) {
         }
     }
 
-    private fun getCtor(className: String): Constructor<*> {
-        val cachedCtor = ctorCache.get(className)
-        if (cachedCtor == null) {
-            val klass = Class.forName(className)
-            val ctor = klass.getConstructor()
-            ctorCache.put(className, ctor)
-            return ctor
-        } else {
-            return cachedCtor
-        }
-    }
-
     private fun execute(job: Job): Unit {
-        val ctor = getCtor(job.className)
+        val className = job.className
+        val ctor =
+            ctorCache.fetch(className, { Class.forName(className).getConstructor() })
         val handler = ctor.newInstance() as IJobHandler
         handler.handle(job)
     }
