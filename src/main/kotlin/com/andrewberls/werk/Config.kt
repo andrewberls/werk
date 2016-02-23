@@ -9,7 +9,7 @@ data class Config(
         private val numThreads: Int? = null,
         private val sleepMs: Long? = null) {
     companion object {
-        fun fromPath(path: String): Config = Utils.readYaml<Config>(path)
+        fun fromPath(path: String): Config = Utils.readYaml(path, Config::class.java)
     }
 
     fun getHost(): String =

@@ -8,7 +8,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.*
 
 object Utils {
-    val YAML_MAPPER: ObjectMapper =
+    private val YAML_MAPPER: ObjectMapper =
         ObjectMapper(YAMLFactory()).registerModule(KotlinModule())
 
     /**
@@ -27,11 +27,9 @@ object Utils {
      * data class Person(name: String, age: Int)
      * val bob = readYaml<Person>("/bob.yml")
      * ```
-     *
-     * TODO: fix signature weirdness
      */
-    inline fun <reified T : Any> readYaml(path: String): T {
+    fun <T> readYaml(path: String, klass: Class<T>): T {
         val contents = slurp(path)
-        return YAML_MAPPER.readValue(contents)
+        return YAML_MAPPER.readValue(contents, klass)
     }
 }
