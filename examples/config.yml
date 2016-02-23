@@ -1,0 +1,7 @@
+host: localhost
+
+port: 6379
+
+numThreads: 4
+
+sleepMs: 1000

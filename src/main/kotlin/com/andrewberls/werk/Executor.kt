@@ -10,7 +10,7 @@ import com.andrewberls.werk.IJobHandler
 import com.andrewberls.werk.Job
 import com.andrewberls.werk.RedisUtils
 
-class Executor(val pool: JedisPool) {
+class Executor(val config: Config, val pool: JedisPool) {
     private val KEY = "werk::jobs"
 
     // className -> Constructor
@@ -48,7 +48,7 @@ class Executor(val pool: JedisPool) {
     }
 
     fun start(): Unit {
-        val sleepMs = Config.sleepMs()
+        val sleepMs = config.getSleepMs()
 
         while (true) {
             val job = acquireJob()

@@ -8,13 +8,13 @@ import com.andrewberls.werk.Executor
 
 // A worker manages a resource pool and spins off a number
 // of executor threads to perform actual tasks
-class Worker(val pool: JedisPool) {
+class Worker(val config: Config, val pool: JedisPool) {
     private var executors: List<Thread>? = null
 
     fun start(): Unit {
         try {
-            executors = (1..Config.numThreads()).map {
-                thread { Executor(pool).start() }
+            executors = (1..config.getNumThreads()).map {
+                thread { Executor(config, pool).start() }
             }
             executors!!.forEach { it.join() }
         } finally {
