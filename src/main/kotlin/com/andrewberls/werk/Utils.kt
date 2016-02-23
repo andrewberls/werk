@@ -20,12 +20,12 @@ object Utils {
     }
 
     /**
-     * Decode YAML file at `path` into an object of class `T`
+     * Decode YAML file at `path` into an object of class `klass`
      *
      * Example:
      * ```
      * data class Person(name: String, age: Int)
-     * val bob = readYaml<Person>("/bob.yml")
+     * val bob: Person = readYaml("/bob.yml", Person::class.java)
      * ```
      */
     fun <T> readYaml(path: String, klass: Class<T>): T {
